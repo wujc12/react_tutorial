@@ -1,11 +1,19 @@
 import React, {ChangeEvent, useEffect, useState} from "react";
 import './index.css';
-import {Button, Input} from "antd";
+import {Button, Input, notification} from "antd";
 import * as toxicity from '@tensorflow-models/toxicity';
 import {noop} from "../../utils";
 
 const {TextArea} = Input;
 const threshold = 0.9;
+
+// 弹窗提醒
+const openNotificationWithIcon = (type: "error" | "warning" | "success" | "info", title: string, description: string) => {
+    notification[type]({
+        message: title,
+        description
+    });
+};
 
 export default function TensorflowDemo () {
     const [buttonLoading, setButtonLoading] = useState(false);
@@ -25,7 +33,7 @@ export default function TensorflowDemo () {
             const loadedModel = await toxicity.load(threshold, ['toxicity']);
             setModel(loadedModel);
         } catch (err) {
-            console.error('模型加载失败！', err);
+            openNotificationWithIcon("error", '错误提醒', '模型加载失败！');
         }
     };
 
@@ -35,7 +43,7 @@ export default function TensorflowDemo () {
 
     const validateText = async (text: string) => {
         if (!model) {
-            console.error('模型尚未加载完成！');
+            openNotificationWithIcon("error", '错误提醒', '模型尚未加载完成！');
             return;
         }
         setButtonLoading(true);

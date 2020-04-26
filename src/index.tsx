@@ -4,6 +4,7 @@ import './index.css';
 import * as serviceWorker from './serviceWorker';
 import {BrowserRouter as Router, Switch, Route, Link} from "react-router-dom";
 import 'antd/dist/antd.css';
+import {Skeleton} from "antd";
 
 const Game = React.lazy(() => import('./pages/Game'));
 const TensorflowDemo = React.lazy(() => import('./pages/TensorflowDemo'));
@@ -22,7 +23,7 @@ function App() {
                         </li>
                     </ul>
                 </div>
-                <Suspense fallback={<div>...</div>}>
+                <Suspense fallback={<Skeleton paragraph={{rows: 2}} />}>
                     <Switch>
                         <Route path='/' exact>
                             <Game/>
