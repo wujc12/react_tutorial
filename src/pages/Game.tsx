@@ -1,7 +1,11 @@
 import React, {useState} from 'react';
-import './Game.less';
+import './Game.css';
 
-// 判断胜负
+/**
+ * 根据棋盘数组的输入判断胜负
+ * @param squares
+ * @return X：X胜出；O：O胜出；null：暂无胜出者
+ */
 const calculateWinner = (squares: Array<string>) => {
     const lines = [
         [0, 1, 2],
@@ -23,7 +27,7 @@ const calculateWinner = (squares: Array<string>) => {
 };
 
 interface SquareProps {
-    value: any,
+    value: any; // 可能是字符串，也可能是null
     onClick: () => void;
 }
 
@@ -37,39 +41,21 @@ function Square (props: SquareProps) {
 }
 
 interface BoardProps {
+    squares: Array<any>;
+    onClick: (i: number) => void;
 }
 
 function Board (props: BoardProps) {
-    const [squares, setSquares] = useState(Array(9).fill(null));
-    // 设置轮流落子
-    const [nextIsX, setNextIsX] = useState(true);
+    const {squares, onClick} = props;
 
-    const handleClick = (i: number) => {
-        // 已经填了 X 或 O 的落子位不能落子；或者已有胜者决出，不再落子
-        if (squares[i] || calculateWinner(squares)) {
-            return;
-        }
-        const newSquares = squares.slice();
-        newSquares[i] = nextIsX ? 'X' : 'O';
-        setNextIsX(!nextIsX);
-        setSquares(newSquares);
-    };
     const renderSquare = (i: number) => {
         return <Square value={squares[i]} onClick={() => {
-            handleClick(i);
+            onClick(i);
         }}/>;
     };
 
-    const winner = calculateWinner(squares);
-    let status;
-    if (winner) {
-        status = 'Winner: ' + winner;
-    } else {
-        status = 'Next player: ' + (nextIsX ? 'X' : 'O');
-    }
     return (
         <div>
-            <div className="status">{status}</div>
             <div className="board-row">
                 {renderSquare(0)}
                 {renderSquare(1)}
@@ -89,18 +75,64 @@ function Board (props: BoardProps) {
     );
 }
 
-interface GameProps {
-}
+export default function Game () {
+    // 棋盘棋子状态记录
+    const [history, setHistory] = useState([{squares: Array(9).fill(null)}]);
+    // 下一个是否为 X 落子，默认 X 先手
+    const [nextIsX, setNextIsX] = useState(true);
+    // 当前的步数
+    const [stepNumber, setStepNumber] = useState(0);
 
-export default function Game (props: GameProps) {
+    const handleClick = (i: number) => {
+        const current = history[stepNumber];
+        const squares = current.squares.slice();
+        if (calculateWinner(squares) || squares[i]) {
+            return;
+        }
+        squares[i] = nextIsX ? 'X' : 'O';
+        setHistory(history.concat([{
+            squares: squares,
+        }]));
+        setNextIsX(!nextIsX);
+        setStepNumber(stepNumber + 1);
+    };
+
+    const jumpTo = (step: number) => {
+        setStepNumber(step);
+        setNextIsX(step % 2 === 0);
+        setHistory(history.slice(0, step + 1));
+    };
+
+    const moves = history.map((step, move) => {
+        const desc = move ?
+            'Go to move #' + move :
+            'Go to game start';
+        return (
+            <li key={move}>
+                <button onClick={() => {jumpTo(move)}}>{desc}</button>
+            </li>
+        );
+    });
+
+    const current = history[stepNumber];
+    const winner = calculateWinner(current.squares);
+    let status;
+    if (winner) {
+        status = 'Winner: ' + winner;
+    } else {
+        status = 'Next player: ' + (nextIsX ? 'X' : 'O');
+    }
+
     return (
         <div className="game">
             <div className="game-board">
-                <Board />
+                <Board squares={current.squares} onClick={(i) => {
+                    handleClick(i);
+                }} />
             </div>
             <div className="game-info">
-                <div>{/* status */}</div>
-                <ol>{/* TODO */}</ol>
+                <div className={winner ? "winner-text" : "no-winner-text"}>{status}</div>
+                <ol>{moves}</ol>
             </div>
         </div>
     );
