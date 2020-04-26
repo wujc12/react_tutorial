@@ -1,0 +1,25 @@
+.tensorflow-container{
+    width: 600px;
+}
+
+.tensorflow-container .tf-title{
+    font-weight: 700;
+    font-size: 16px;
+    margin-top: 12px;
+}
+
+.tensorflow-container .tf-text-area{
+    margin-bottom: 12px;
+}
+
+.tensorflow-container .tf-result{
+    border-radius: 3px;
+    background-color: #eee;
+    padding: 0 6px;
+    margin-top: 12px;
+    width: 600px;
+    min-height: 24px;
+    line-height: 24px;
+    font-size: 15px;
+    word-break: break-all;
+}
