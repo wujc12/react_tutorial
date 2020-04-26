@@ -4,9 +4,9 @@ import './Game.css';
 /**
  * 根据棋盘数组的输入判断胜负
  * @param squares
- * @return X：X胜出；O：O胜出；null：暂无胜出者
+ * @return X：X胜出；O：O胜出；null：暂无胜出者；even：平局
  */
-const calculateWinner = (squares: Array<string>) => {
+const calculateWinner = (squares: Array<any>) => {
     const lines = [
         [0, 1, 2],
         [3, 4, 5],
@@ -22,6 +22,10 @@ const calculateWinner = (squares: Array<string>) => {
         if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
             return squares[a];
         }
+    }
+    // squares 已经满了，但是没有胜者，因此判断平局
+    if (!squares.includes(null)) {
+        return 'even';
     }
     return null;
 };
@@ -117,8 +121,10 @@ export default function Game () {
     const current = history[stepNumber];
     const winner = calculateWinner(current.squares);
     let status;
-    if (winner) {
-        status = 'Winner: ' + winner;
+    if (winner === 'X' || winner === 'O') {
+        status = 'Winner is: ' + winner;
+    } else if (winner === 'even') {
+        status = 'Play is Even!';
     } else {
         status = 'Next player: ' + (nextIsX ? 'X' : 'O');
     }
@@ -131,7 +137,7 @@ export default function Game () {
                 }} />
             </div>
             <div className="game-info">
-                <div className={winner ? "winner-text" : "no-winner-text"}>{status}</div>
+                <div className={['X', 'O'].includes(winner) ? "winner-text" : "no-winner-text"}>{status}</div>
                 <ol>{moves}</ol>
             </div>
         </div>
