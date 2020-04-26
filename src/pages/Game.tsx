@@ -132,6 +132,9 @@ export default function Game () {
     return (
         <div className="game">
             <div className="game-board">
+                <div className="game-title">
+                    三子棋：
+                </div>
                 <Board squares={current.squares} onClick={(i) => {
                     handleClick(i);
                 }} />
